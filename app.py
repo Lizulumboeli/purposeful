@@ -17,7 +17,7 @@ st.set_page_config(
     page_title="Purposeful — AI Mentor for Women in Tech",
     page_icon="✨",
     layout="wide",
-    initial_sidebar_state="expanded",
+    initial_sidebar_state="collapsed",
 )
 
 # Force sidebar open on every load — prevents Streamlit from auto-collapsing it
@@ -42,19 +42,32 @@ st.markdown("""
 /* Mobile (< 768px): stack everything, shrink fonts, let the sidebar
    collapse behind Streamlit's native hamburger toggle */
 @media (max-width: 768px) {
+    /* Sidebar collapses inline and never overlaps the main content */
+    section[data-testid="stSidebar"] {
+        width: 100% !important;
+        min-width: unset !important;
+        position: relative !important;
+    }
     /* Show the hamburger control so the user can open the sidebar */
     [data-testid="stSidebarCollapsedControl"] {
         display: block !important;
     }
-    /* Stack all column layouts: score cards, quick actions, and panels */
+    /* Tighter page padding on small screens */
+    .main .block-container,
+    [data-testid="stMain"] .block-container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+    /* Stack all column layouts (score cards, quick actions, panels) into a
+       responsive single/auto-fit grid */
     [data-testid="stHorizontalBlock"] {
-        flex-wrap: wrap !important;
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)) !important;
         gap: 0.5rem !important;
     }
     [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
-        flex: 1 1 100% !important;
         width: 100% !important;
-        min-width: 100% !important;
+        min-width: unset !important;
     }
     /* Slightly smaller type on small screens */
     html, body, [data-testid="stAppViewContainer"] {
