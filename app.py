@@ -1539,18 +1539,21 @@ if active == "home":
     greeting_text = f"{get_greeting()}, {name}! 👋" if name else f"{get_greeting()}! 👋"
     # Only show the avatar once a name is set (otherwise it's a meaningless "?")
     avatar_html = f'<div class="avatar">{name[:1].upper()}</div>' if name else ""
-    st.markdown(f"""
-    <div class="top-bar">
-        <div>
-            <span class="greeting-name">{greeting_text}</span>
-            <span class="greeting-sub">Ready to build your future in AI?</span>
-        </div>
-        <div class="top-bar-right">
-            <div class="streak-badge">🔥 7 day streak</div>
-            {avatar_html}
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    # Built as a single line (no blank lines / indentation) so an empty avatar
+    # doesn't break the HTML block into literal text.
+    st.markdown(
+        '<div class="top-bar">'
+        '<div>'
+        f'<span class="greeting-name">{greeting_text}</span>'
+        '<span class="greeting-sub">Ready to build your future in AI?</span>'
+        '</div>'
+        '<div class="top-bar-right">'
+        '<div class="streak-badge">🔥 7 day streak</div>'
+        f'{avatar_html}'
+        '</div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
 
     # First-visit name capture — compact input + button on one row
     if not st.session_state.user_name.strip():
