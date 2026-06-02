@@ -1611,13 +1611,28 @@ if active == "home":
         # ── Hero card ─────────────────────────
         luna_html = '<span class="luna-cat-emoji" onclick="this.classList.add(\'bouncing\'); setTimeout(()=>this.classList.remove(\'bouncing\'),700)" title="Click me!">🐱</span>'
 
+        # Dynamic Luna message: prompt for resume first, then personalize once analyzed
+        if st.session_state.scores:
+            if name:
+                hero_msg = (
+                    f"Hi {name}! ✨ Here's what I picked for you today — your scores are "
+                    "ready below. Click a card to keep building your future in AI!"
+                )
+            else:
+                hero_msg = (
+                    "Here's what I picked for you today — your scores are ready below. "
+                    "Click a card to keep building your future in AI!"
+                )
+        else:
+            hero_msg = "Start by uploading your resume below — I'll calculate all 4 scores instantly!"
+
         st.markdown(f"""
         <div class="hero-card">
             <div class="hero-inner">
                 {luna_html}
                 <div class="hero-text">
                     <div class="hero-title">Hi! I'm Luna ✨</div>
-                    <div class="hero-msg">You're making amazing progress! Your AI PM readiness score jumped <strong style="color:#fde68a">8 points</strong> this week. Let's keep that momentum — I've picked your top 3 actions for today. Click a card below to get started!</div>
+                    <div class="hero-msg">{hero_msg}</div>
                 </div>
             </div>
         </div>
@@ -1644,10 +1659,15 @@ if active == "home":
             with s_cols[i]:
                 src = (s or {}).get(key) or DEFAULT_SCORES[key]
                 val = src["score"]
-                # Before analysis: show a dash instead of a misleading 0%
-                value_display = f"{val}%" if has_scores else "—"
-                bar_width = val if has_scores else 0
-                reason_html = f'<div class="sc-reason">{src["reason"]}</div>'
+                if has_scores:
+                    value_display = f"{val}%"
+                    bar_width = val
+                    reason_html = f'<div class="sc-reason">{src["reason"]}</div>'
+                else:
+                    # Locked empty state before any resume is analyzed
+                    value_display = "🔒"
+                    bar_width = 0
+                    reason_html = '<div class="sc-reason">Upload resume to unlock</div>'
                 st.markdown(f"""
                 <div class="score-card {color}">
                     <div class="sc-emoji">{emoji}</div>
@@ -1679,7 +1699,7 @@ if active == "home":
                 label="resume_input",
                 label_visibility="collapsed",
                 value=st.session_state.user_resume,
-                placeholder="Paste your full resume text here…",
+                placeholder="Paste your resume here — the more detail, the better Luna can analyze you.",
                 height=180,
                 key="resume_textarea",
             )
@@ -1705,6 +1725,7 @@ if active == "home":
                 key="analyze_btn",
                 use_container_width=True,
                 type="primary",
+                disabled=not resume_text.strip(),
             )
         with status_col:
             if st.session_state.scores:
