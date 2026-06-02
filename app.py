@@ -23,12 +23,47 @@ st.set_page_config(
 # Force sidebar open on every load — prevents Streamlit from auto-collapsing it
 st.markdown("""
 <style>
-[data-testid="stSidebar"] {
-    display: flex !important;
-    visibility: visible !important;
-    transform: none !important;
-    width: 230px !important;
-    min-width: 230px !important;
+/* Desktop: keep the sidebar pinned open and hide its collapse arrow */
+@media (min-width: 769px) {
+    [data-testid="stSidebar"] {
+        display: flex !important;
+        visibility: visible !important;
+        transform: none !important;
+        width: 230px !important;
+        min-width: 230px !important;
+    }
+    section[data-testid="stSidebar"] > div:first-child button[kind="header"],
+    [data-testid="stSidebarCollapseButton"],
+    [data-testid="stSidebarCollapsedControl"] {
+        display: none !important;
+    }
+}
+
+/* Mobile (< 768px): stack everything, shrink fonts, let the sidebar
+   collapse behind Streamlit's native hamburger toggle */
+@media (max-width: 768px) {
+    /* Show the hamburger control so the user can open the sidebar */
+    [data-testid="stSidebarCollapsedControl"] {
+        display: block !important;
+    }
+    /* Stack all column layouts: score cards, quick actions, and panels */
+    [data-testid="stHorizontalBlock"] {
+        flex-wrap: wrap !important;
+        gap: 0.5rem !important;
+    }
+    [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        min-width: 100% !important;
+    }
+    /* Slightly smaller type on small screens */
+    html, body, [data-testid="stAppViewContainer"] {
+        font-size: 0.92rem !important;
+    }
+    .greeting-name { font-size: 1.15rem !important; }
+    .hero-title { font-size: 1.1rem !important; }
+    .sc-value { font-size: 1.4rem !important; }
+    .top-bar { flex-wrap: wrap !important; gap: 0.5rem !important; }
 }
 </style>
 """, unsafe_allow_html=True)
@@ -364,6 +399,9 @@ if "career_goal" not in st.session_state:
 
 if "profile_ready" not in st.session_state:
     st.session_state.profile_ready = False
+
+if "user_name" not in st.session_state:
+    st.session_state.user_name = ""
 
 if "courses" not in st.session_state:
     st.session_state.courses = []  # list of {name, url, category, folder, status}
@@ -1478,18 +1516,37 @@ if active == "home":
             pass  # silently skip — user can hit ↻ manually
 
     # ── Top bar ──────────────────────────────
+    name = st.session_state.user_name.strip()
+    greeting_text = f"{get_greeting()}, {name}! 👋" if name else f"{get_greeting()}! 👋"
+    avatar_letter = (name[:1] or "?").upper()
     st.markdown(f"""
     <div class="top-bar">
         <div>
-            <span class="greeting-name">{get_greeting()}, Liz! 👋</span>
+            <span class="greeting-name">{greeting_text}</span>
             <span class="greeting-sub">Ready to build your future in AI?</span>
         </div>
         <div class="top-bar-right">
             <div class="streak-badge">🔥 7 day streak</div>
-            <div class="avatar">L</div>
+            <div class="avatar">{avatar_letter}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
+
+    # First-visit name capture
+    if not st.session_state.user_name.strip():
+        name_col, save_col = st.columns([3, 1])
+        with name_col:
+            name_input = st.text_input(
+                "What's your name?",
+                placeholder="Enter your first name…",
+                key="name_input",
+                label_visibility="collapsed",
+            )
+        with save_col:
+            if st.button("Save name", use_container_width=True):
+                if name_input.strip():
+                    st.session_state.user_name = name_input.strip()
+                    st.rerun()
 
     # ── Two-column layout ─────────────────────
     col_main, col_right = st.columns([1.85, 1], gap="large")
