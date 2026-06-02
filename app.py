@@ -23,6 +23,18 @@ st.set_page_config(
 # Mobile responsiveness — let Streamlit handle the sidebar toggle natively
 st.markdown("""
 <style>
+/* Hide Streamlit's built-in help / hamburger menu (NOT the sidebar toggle) */
+button[data-testid="baseButton-header"] { display: none !important; }
+#MainMenu { display: none !important; }
+
+/* Keep the AI News heading + refresh button on the same row everywhere */
+[data-testid="stHorizontalBlock"]:has(.news-refresh-marker) {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+}
+
 @media (max-width: 768px) {
     /* Tighter page padding on small screens */
     .main .block-container,
@@ -41,6 +53,19 @@ st.markdown("""
         width: 100% !important;
         min-width: unset !important;
     }
+    /* News heading row stays inline even on mobile (override the grid above) */
+    [data-testid="stHorizontalBlock"]:has(.news-refresh-marker) {
+        display: flex !important;
+        justify-content: space-between !important;
+    }
+    /* Hero card: stack the cat on top, text below, full width */
+    .hero-inner {
+        flex-direction: column !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 0.75rem !important;
+    }
+    .luna-cat-emoji { font-size: 3.2rem !important; }
     /* Slightly smaller type on small screens */
     html, body, [data-testid="stAppViewContainer"] {
         font-size: 0.92rem !important;
@@ -1524,9 +1549,9 @@ if active == "home":
     </div>
     """, unsafe_allow_html=True)
 
-    # First-visit name capture
+    # First-visit name capture — compact input + button on one row
     if not st.session_state.user_name.strip():
-        name_col, save_col = st.columns([3, 1])
+        name_col, save_col, _spacer = st.columns([2, 1, 3])
         with name_col:
             name_input = st.text_input(
                 "What's your name?",
@@ -1607,19 +1632,23 @@ if active == "home":
             ("AI Skill Score",   "green",  "🤖", "ai_skill_score"),
         ]
 
+        has_scores = bool(s)
         s_cols = st.columns(4, gap="small")
         for i, (lbl, color, emoji, key) in enumerate(score_data):
             with s_cols[i]:
                 src = (s or {}).get(key) or DEFAULT_SCORES[key]
                 val = src["score"]
+                # Before analysis: show a dash instead of a misleading 0%
+                value_display = f"{val}%" if has_scores else "—"
+                bar_width = val if has_scores else 0
                 reason_html = f'<div class="sc-reason">{src["reason"]}</div>'
                 st.markdown(f"""
                 <div class="score-card {color}">
                     <div class="sc-emoji">{emoji}</div>
                     <div class="sc-label">{lbl}</div>
-                    <div class="sc-value">{val}%</div>
+                    <div class="sc-value">{value_display}</div>
                     <div class="prog-track">
-                        <div class="prog-bar" style="width:{val}%"></div>
+                        <div class="prog-bar" style="width:{bar_width}%"></div>
                     </div>
                     {reason_html}
                 </div>
