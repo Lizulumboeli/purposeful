@@ -23,9 +23,11 @@ st.set_page_config(
 # Mobile responsiveness — let Streamlit handle the sidebar toggle natively
 st.markdown("""
 <style>
-/* Hide Streamlit's built-in help / hamburger menu (NOT the sidebar toggle) */
-button[data-testid="baseButton-header"] { display: none !important; }
+/* Hide ONLY the question-mark / main-menu help button in the top-right corner.
+   (Does NOT touch the sidebar toggle arrow, the header, or anything else.) */
 #MainMenu { display: none !important; }
+button[data-testid="baseButton-header"] { display: none !important; }
+[data-testid="stMainMenu"] { display: none !important; }
 
 /* Keep the AI News heading + refresh button on the same row everywhere */
 [data-testid="stHorizontalBlock"]:has(.news-refresh-marker) {
