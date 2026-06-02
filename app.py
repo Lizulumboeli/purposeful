@@ -1537,7 +1537,8 @@ if active == "home":
     # ── Top bar ──────────────────────────────
     name = st.session_state.user_name.strip()
     greeting_text = f"{get_greeting()}, {name}! 👋" if name else f"{get_greeting()}! 👋"
-    avatar_letter = (name[:1] or "?").upper()
+    # Only show the avatar once a name is set (otherwise it's a meaningless "?")
+    avatar_html = f'<div class="avatar">{name[:1].upper()}</div>' if name else ""
     st.markdown(f"""
     <div class="top-bar">
         <div>
@@ -1546,7 +1547,7 @@ if active == "home":
         </div>
         <div class="top-bar-right">
             <div class="streak-badge">🔥 7 day streak</div>
-            <div class="avatar">{avatar_letter}</div>
+            {avatar_html}
         </div>
     </div>
     """, unsafe_allow_html=True)
