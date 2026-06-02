@@ -20,43 +20,15 @@ st.set_page_config(
     initial_sidebar_state="collapsed",
 )
 
-# Force sidebar open on every load — prevents Streamlit from auto-collapsing it
+# Mobile responsiveness — let Streamlit handle the sidebar toggle natively
 st.markdown("""
 <style>
-/* Desktop: keep the sidebar pinned open and hide its collapse arrow */
-@media (min-width: 769px) {
-    [data-testid="stSidebar"] {
-        display: flex !important;
-        visibility: visible !important;
-        transform: none !important;
-        width: 230px !important;
-        min-width: 230px !important;
-    }
-    section[data-testid="stSidebar"] > div:first-child button[kind="header"],
-    [data-testid="stSidebarCollapseButton"],
-    [data-testid="stSidebarCollapsedControl"] {
-        display: none !important;
-    }
-}
-
-/* Mobile (< 768px): stack everything, shrink fonts, let the sidebar
-   collapse behind Streamlit's native hamburger toggle */
 @media (max-width: 768px) {
-    /* Sidebar collapses inline and never overlaps the main content */
-    section[data-testid="stSidebar"] {
-        width: 100% !important;
-        min-width: unset !important;
-        position: relative !important;
-    }
-    /* Show the hamburger control so the user can open the sidebar */
-    [data-testid="stSidebarCollapsedControl"] {
-        display: block !important;
-    }
     /* Tighter page padding on small screens */
     .main .block-container,
     [data-testid="stMain"] .block-container {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
+        padding: 0.5rem !important;
+        max-width: 100% !important;
     }
     /* Stack all column layouts (score cards, quick actions, panels) into a
        responsive single/auto-fit grid */
@@ -77,6 +49,7 @@ st.markdown("""
     .hero-title { font-size: 1.1rem !important; }
     .sc-value { font-size: 1.4rem !important; }
     .top-bar { flex-wrap: wrap !important; gap: 0.5rem !important; }
+    /* Do NOT hide or override the sidebar toggle button */
 }
 </style>
 """, unsafe_allow_html=True)
@@ -635,27 +608,15 @@ st.markdown("""
 }
 
 /* ── Sidebar shell — always visible ───────────── */
+/* Sidebar — cosmetic only; let Streamlit control open/collapse natively */
 [data-testid="stSidebar"] {
     background: #fdf5ff !important;
     border-right: 1px solid #e9d5ff;
-    min-width: 230px !important;
-    max-width: 230px !important;
-    display: flex !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-    transform: none !important;
 }
 
 [data-testid="stSidebar"] > div:first-child {
     background: #fdf5ff;
     padding-top: 0;
-    display: block !important;
-}
-
-/* Keep the native collapse arrow visible so user can always reopen */
-[data-testid="stSidebarCollapsedControl"] {
-    display: flex !important;
-    visibility: visible !important;
 }
 
 /* ── Sidebar logo ─────────────────────────────── */
