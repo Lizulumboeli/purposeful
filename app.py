@@ -619,6 +619,24 @@ st.markdown("""
     padding-top: 0;
 }
 
+/* Always keep the reopen control visible when the sidebar is collapsed.
+   Streamlit has used different test IDs across versions, so target all. */
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"],
+button[kind="header"],
+[data-testid="stExpandSidebarButton"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 9999 !important;
+}
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="collapsedControl"] {
+    position: fixed !important;
+    top: 0.5rem !important;
+    left: 0.5rem !important;
+}
+
 /* ── Sidebar logo ─────────────────────────────── */
 .sb-logo {
     font-size: 1.25rem;
