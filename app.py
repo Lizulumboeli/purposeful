@@ -1555,21 +1555,21 @@ if active == "home":
         unsafe_allow_html=True,
     )
 
-    # First-visit name capture — compact input + button on one row
-    if not st.session_state.user_name.strip():
-        name_col, save_col, _spacer = st.columns([2, 1, 3])
-        with name_col:
-            name_input = st.text_input(
-                "What's your name?",
-                placeholder="Enter your first name…",
-                key="name_input",
-                label_visibility="collapsed",
-            )
-        with save_col:
-            if st.button("Save name", use_container_width=True):
-                if name_input.strip():
-                    st.session_state.user_name = name_input.strip()
-                    st.rerun()
+    # Name capture — always visible so each user can set/update their own name.
+    # Stored ONLY in st.session_state (per-session, per-user; never shared globally).
+    name_col, save_col, _spacer = st.columns([2, 1, 3])
+    with name_col:
+        name_input = st.text_input(
+            "What's your name?",
+            value=st.session_state.user_name,
+            placeholder="Enter your first name…",
+            key="name_input",
+            label_visibility="collapsed",
+        )
+    with save_col:
+        if st.button("Save name", use_container_width=True):
+            st.session_state.user_name = name_input.strip()
+            st.rerun()
 
     # ── Two-column layout ─────────────────────
     col_main, col_right = st.columns([1.85, 1], gap="large")
